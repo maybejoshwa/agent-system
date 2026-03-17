@@ -1,34 +1,22 @@
 # agent-system
 
-An AI agent system that operates on real data through CLI tools and markdown-based behavior rules.
+An AI agent system built on the **WAT Framework** — separating probabilistic reasoning (AI) from deterministic execution (code).
+
+Inspired by [Nate Herk](https://www.youtube.com/@nateherk) / AI Automation Society.
 
 ---
 
-## What This Is
+## WAT Framework
 
-This repo is the foundation of an AI operating system built for a solo builder. It combines:
+Three layers that keep AI reasoning and code execution cleanly separated:
 
-- **GWS CLI** — the execution layer for all Google Workspace operations
-- **Markdown rule files** — the behavior layer that governs how the agent acts
-- **Modular structure** — designed to grow into workflows, automations, and multi-agent tasks
+| Layer | Location | Format | Purpose |
+|-------|----------|--------|---------|
+| **Workflows** | `/workflows` | `.md` | SOPs — define objectives, inputs, tool sequences, and edge cases in plain English |
+| **Agent** | `CLAUDE.md` | `.md` | Core instruction set — tells the agent how to navigate folders, which tools to use, and how to follow workflows |
+| **Tools** | `/tools` | `.py` | Actual execution code — scraping, sending email, querying APIs, etc. |
 
-The agent does not simulate or assume data. It executes commands and operates on real output.
-
----
-
-## How GWS CLI Fits In
-
-[GWS CLI](https://github.com/googleworkspace/cli) is a unified command-line tool for Google Workspace (Drive, Gmail, Docs, Sheets, Slides, Calendar). Every interaction with Google Workspace in this system goes through `gws`. No direct API calls. No fabricated responses.
-
----
-
-## How the Agent Uses Markdown Files
-
-Markdown files in `/agent/` define the agent's behavior rules and constraints. They are loaded as system context when running agent tasks.
-
-| File | Purpose |
-|------|---------|
-| `agent/gws_rules.md` | Enforces GWS CLI usage, defines execution patterns and tool mappings |
+> API keys and secrets are **never** stored in tool files. They live in `.env`.
 
 ---
 
@@ -36,59 +24,53 @@ Markdown files in `/agent/` define the agent's behavior rules and constraints. T
 
 ```
 agent-system/
+├── workflows/             # Markdown SOPs (one file per automation)
+├── tools/                 # Python scripts that execute actions
 ├── agent/
 │   └── gws_rules.md       # GWS CLI behavior rules
-├── workflows/             # Multi-step automation scripts (future)
-├── prompts/               # Reusable prompt templates (future)
-├── docs/                  # Extended documentation (future)
+├── prompts/               # Reusable prompt templates
+├── docs/                  # Extended documentation
+├── .env                   # Secrets (never committed)
 ├── .gitignore
 └── README.md
 ```
 
 ---
 
-## Usage
+## Execution Layer: GWS CLI
 
-### Prerequisites
-- [GWS CLI](https://github.com/googleworkspace/cli) installed and authenticated
-- Node.js installed
+[GWS CLI](https://github.com/googleworkspace/cli) handles all Google Workspace operations (Drive, Gmail, Docs, Sheets, Slides, Calendar). No direct API calls. No fabricated responses.
 
-### Setup
 ```bash
-git clone <your-repo-url>
+gws drive files list
+gws gmail users messages list --params '{"userId": "me", "q": "is:unread"}'
+gws calendar events list --params '{"calendarId": "primary"}'
+```
+
+---
+
+## Setup
+
+```bash
+git clone https://github.com/maybejoshwa/agent-system.git
 cd agent-system
 ```
 
-### Authentication (one-time)
+### GWS Authentication (one-time)
 ```bash
 export GOOGLE_WORKSPACE_CLI_CLIENT_ID="your-client-id"
 export GOOGLE_WORKSPACE_CLI_CLIENT_SECRET="your-client-secret"
 gws auth login
 ```
 
-### Run a GWS command
-```bash
-gws drive files list
-gws gmail users messages list --params '{"userId": "me", "q": "is:unread"}'
-```
-
----
-
-## Rule File Versioning
-
-Rule files like `gws_rules.md` are versioned with git. To update safely:
-1. Edit the rule file
-2. Test the change in a live session
-3. Commit with a descriptive message: `feat(agent): update gws execution pattern`
-
 ---
 
 ## Git Commit Convention
 
 ```
-feat(scope):     new capability
-fix(scope):      bug or behavior correction
-update(scope):   modification to existing rule or file
-docs(scope):     documentation only
-refactor(scope): restructure without behavior change
+feat(scope):      new capability
+fix(scope):       bug or behavior correction
+update(scope):    modification to existing rule or file
+docs(scope):      documentation only
+refactor(scope):  restructure without behavior change
 ```
