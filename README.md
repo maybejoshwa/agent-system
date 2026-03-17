@@ -6,15 +6,19 @@ Inspired by [Nate Herk](https://www.youtube.com/@nateherk) / AI Automation Socie
 
 ---
 
-## WAT Framework
+## WAT+ Framework
 
-Three layers that keep AI reasoning and code execution cleanly separated:
+Five layers that keep AI reasoning and code execution cleanly separated:
 
 | Layer | Location | Format | Purpose |
 |-------|----------|--------|---------|
-| **Workflows** | `/workflows` | `.md` | SOPs — define objectives, inputs, tool sequences, and edge cases in plain English |
-| **Agent** | `CLAUDE.md` | `.md` | Core instruction set — tells the agent how to navigate folders, which tools to use, and how to follow workflows |
-| **Tools** | `/tools` | `.py` | Actual execution code — scraping, sending email, querying APIs, etc. |
+| **Workflows** | `/workflows` | `.md` | SOPs — objectives, inputs, tool sequences, edge cases in plain English |
+| **Agent** | `CLAUDE.md` | `.md` | Core instruction set — navigation, tool selection, behavior rules |
+| **Tools** | `/tools` | `.py` | Execution code — deterministic scripts, APIs, data transforms |
+| **Knowledge** | `/knowledge/sources` | `.md/.txt` | RAG source files — searchable reference material |
+| **Skills** | `~/.claude/commands/` | `.md` | Reusable slash-command procedures for recurring tasks |
+
+**MCP Servers** (in `~/.claude/settings.json`): `filesystem` · `fetch` · `sequential-thinking`
 
 > API keys and secrets are **never** stored in tool files. They live in `.env`.
 
@@ -24,15 +28,19 @@ Three layers that keep AI reasoning and code execution cleanly separated:
 
 ```
 agent-system/
+├── CLAUDE.md              # Agent instructions (WAT+ framework)
 ├── workflows/             # Markdown SOPs (one file per automation)
 ├── tools/                 # Python scripts that execute actions
+│   ├── rag_search.py      # RAG search tool
+│   └── requirements.txt   # pip dependencies
+├── skills/                # Skill documentation (invokable at ~/.claude/commands/)
+├── knowledge/
+│   ├── sources/           # Knowledge base source files (.md, .txt)
+│   └── index/             # ChromaDB vector index (gitignored)
 ├── agent/
-│   └── gws_rules.md       # GWS CLI behavior rules
-├── prompts/               # Reusable prompt templates
-├── docs/                  # Extended documentation
+│   └── gws_rules.md       # GWS CLI enforcement rules (full reference)
 ├── .env                   # Secrets (never committed)
-├── .gitignore
-└── README.md
+└── .gitignore
 ```
 
 ---

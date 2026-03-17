@@ -57,12 +57,18 @@ This loop is how the framework improves over time.
 
 **Directory layout:**
 ```
-.tmp/           # Temporary files (scraped data, intermediate exports). Regenerated as needed.
-tools/          # Python scripts for deterministic execution
-workflows/      # Markdown SOPs defining what to do and how
+.tmp/                    # Temporary files (scraped data, intermediate exports). Regenerated as needed.
+tools/                   # Python scripts for deterministic execution
+  └── rag_search.py      # RAG semantic search tool
+  └── requirements.txt   # pip dependencies
+workflows/               # Markdown SOPs defining what to do and how
+skills/                  # Skill documentation (invokable files live at ~/.claude/commands/)
+knowledge/
+  ├── sources/           # Plain-text knowledge files (.md, .txt)
+  └── index/             # ChromaDB vector index (gitignored, auto-generated)
 agent/
-└── gws_rules.md  # GWS CLI enforcement rules (full reference)
-.env            # API keys and environment variables (NEVER store secrets anywhere else)
+└── gws_rules.md         # GWS CLI enforcement rules (full reference)
+.env                     # API keys and environment variables (NEVER store secrets anywhere else)
 credentials.json, token.json  # Google OAuth (gitignored)
 ```
 
@@ -99,6 +105,67 @@ gws auth status
 ```
 
 When in doubt: **run the command.**
+
+## MCP Servers
+
+Three MCP servers extend Claude Code beyond what CLI tools cover. Configured in `~/.claude/settings.json`.
+
+| Server | Purpose | When to use |
+|--------|---------|-------------|
+| `filesystem` | Read/write files in repo and `.tmp/` | Structured file I/O without shell round-trips |
+| `fetch` | Fetch live web pages and external APIs | Web research, any URL not covered by gws CLI |
+| `sequential-thinking` | Structured multi-step reasoning | Complex workflows that span multiple tools |
+
+**Do not replace GWS CLI calls with MCP.** GWS CLI is the sole interface for Google Workspace. MCPs handle everything outside that domain.
+
+To add a new MCP: add one entry to `~/.claude/settings.json` under `mcpServers` and restart Claude Code.
+
+---
+
+## Skills (Slash Commands)
+
+Reusable procedures invoked with `/skill-name`. Source docs live in `skills/`, invokable files at `~/.claude/commands/`.
+
+| Command | Purpose |
+|---------|---------|
+| `/inbox-summary` | Summarize unread Gmail, surface action items |
+| `/draft-email` | Draft and optionally send email from plain-language description |
+| `/calendar-brief` | Today/tomorrow schedule as a clean timeline |
+| `/drive-recent` | 15 most recently modified Drive files with links |
+| `/rag-search` | Semantic search over local knowledge base |
+
+To add a new skill: drop a `.md` file in `~/.claude/commands/` — instantly available, no restart needed. See `skills/README.md` for the template.
+
+---
+
+## RAG — Knowledge Base
+
+Semantic search over `knowledge/sources/` using ChromaDB + sentence-transformers (fully offline).
+
+```bash
+# Index / re-index after adding new source files
+python tools/rag_search.py --ingest
+
+# Search
+python tools/rag_search.py --query "how does GWS handle pagination" --top_k 5
+```
+
+To add new knowledge: drop `.md` or `.txt` files in `knowledge/sources/` and re-run `--ingest`.
+The vector index (`knowledge/index/`) is gitignored — regenerate from sources on any machine.
+
+Prerequisites: Python 3.11+ from python.org, then `pip install -r tools/requirements.txt`.
+
+---
+
+## Projects Context
+
+This repo IS the Claude Code project. `CLAUDE.md` at the root is loaded automatically when the working directory is `agent-system/`.
+
+There is no `.claude/` inside this repo by design — skills and MCP config are global (`~/.claude/`) because they apply across all sessions. If you need skills scoped to only this project, create `.claude/commands/` in the repo root.
+
+Project memory lives at: `~/.claude/projects/c--Users-maybe-projects-agent-system/memory/`
+
+---
 
 ## Bottom Line
 
