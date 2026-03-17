@@ -110,6 +110,8 @@ def query(query_text: str, top_k: int = 5):
 
 
 def main():
+    global SOURCE_DIR, INDEX_DIR
+
     parser = argparse.ArgumentParser(description="RAG search tool for agent-system knowledge base")
     parser.add_argument("--ingest", action="store_true", help="Index all files in knowledge/sources/")
     parser.add_argument("--query", type=str, help="Semantic search query")
@@ -119,7 +121,6 @@ def main():
     args = parser.parse_args()
 
     # Override globals if custom paths provided
-    global SOURCE_DIR, INDEX_DIR
     SOURCE_DIR = args.source_dir
     INDEX_DIR = args.index_dir
 
