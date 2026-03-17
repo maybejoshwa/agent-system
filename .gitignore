@@ -1,0 +1,77 @@
+# ============================================================
+# CREDENTIALS & AUTH — NEVER COMMIT THESE
+# ============================================================
+*.env
+.env
+.env.*
+*.secret
+*.key
+*_secret.json
+client_secret*.json
+credentials.json
+credentials.enc
+token.json
+*.token
+
+# GWS CLI auth files
+.config/gws/
+~/.config/gws/
+gws_credentials*
+gws_token*
+
+# Google Cloud SDK
+.config/gcloud/
+application_default_credentials.json
+
+# ============================================================
+# OS FILES
+# ============================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# ============================================================
+# EDITOR & IDE
+# ============================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-workspace
+
+# ============================================================
+# NODE / NPM (if any tooling is added)
+# ============================================================
+node_modules/
+npm-debug.log*
+yarn-error.log*
+package-lock.json
+
+# ============================================================
+# LOGS & TEMP
+# ============================================================
+*.log
+logs/
+tmp/
+temp/
+.cache/
+
+# ============================================================
+# SENSITIVE CONFIG
+# ============================================================
+config.local.*
+*.local.json
+secrets/
+private/
